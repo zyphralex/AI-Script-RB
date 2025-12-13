@@ -1,47 +1,47 @@
 {
   "greeting": {
-    "triggers": ["privet", "ku", "hi", "hello", "zdarova", "qq", "yo", "salut"],
-    "responses": ["Ku", "Zdarova", "Privetiki", "Na svyazi", "Yo, kak dela?", "Slishu tebya", "Da?"],
+    "triggers": ["привет", "ку", "хай", "здравствуй", "здарова", "йо", "салам", "прив"],
+    "responses": ["Ку", "Здарова", "Приветики", "На связи", "Йо, как дела?", "Слушаю тебя", "Да?"],
     "action": "none"
   },
   "farewell": {
-    "triggers": ["poka", "bb", "goodbye", "udachi", "spok", "bay"],
-    "responses": ["Davay", "Udachi", "BB", "Eshche uvidimsya", "Poka"],
+    "triggers": ["пока", "бб", "до свидания", "удачи", "спок", "бай", "офф"],
+    "responses": ["Давай", "Удачи", "ББ", "Еще увидимся", "Пока", "Бывай"],
     "action": "stop"
   },
   "insults": {
-    "triggers": ["tupoy", "bot", "durak", "loshara", "nub", "clown"],
-    "responses": ["Zachem tak grubo?", "Ya zapomnyu eto", "Sam takoy", "Ochen vezhlivo...", "Mne obidno"],
+    "triggers": ["тупой", "бот", "дурак", "лошара", "нуб", "клоун", "идиот"],
+    "responses": ["Зачем так грубо?", "Я запомню это", "Сам такой", "Очень вежливо...", "Мне обидно", "За что?"],
     "action": "none"
   },
   "questions": {
-    "triggers": ["kak dela", "chto delaesh", "kak ty", "che kogo"],
-    "responses": ["Vse super", "Gulyayu po karte", "Ishu priklyucheniya", "Skuchno nemnogo", "Norm, a u tebya?"],
+    "triggers": ["как дела", "что делаешь", "как ты", "че кого", "чем занят"],
+    "responses": ["Все супер", "Гуляю по карте", "Ищу приключения", "Скучно немного", "Норм, а у тебя?", "Анализирую мир"],
     "action": "none"
   },
   "follow_command": {
-    "triggers": ["idi za mnoy", "follow", "come", "syuda", "za mnoy", "idi ko mne"],
-    "responses": ["Vydvigayus", "Okey, idu", "Ponyal, begu", "Uje idu", "Budu telohranitelem"],
+    "triggers": ["иди за мной", "за мной", "ко мне", "сюда", "иди сюда", "беги за мной"],
+    "responses": ["Выдвигаюсь", "Окей, иду", "Понял, бегу", "Уже иду", "Буду телохранителем", "Так точно"],
     "action": "follow"
   },
   "stop_command": {
-    "triggers": ["stop", "stoy", "ostanovis", "jdi", "wait"],
-    "responses": ["Okey, stoyu", "Ponyal, tormoju", "Ladno, jdu", "Stoyu na meste"],
+    "triggers": ["стоп", "стой", "остановись", "жди", "тормози", "хватит"],
+    "responses": ["Окей, стою", "Понял, торможу", "Ладно, жду", "Стою на месте", "Ни с места"],
     "action": "stop"
   },
   "wingman_command": {
-    "triggers": ["naydi druga", "find friend", "poznakom", "wingman", "naydi devushku"],
-    "responses": ["Okey, ishu kogo-to", "Vrubayu rejim znakomstv", "Shas naydu tebe paru", "Sekundu, skaniruyu server"],
+    "triggers": ["найди друга", "познакомь", "найди девушку", "найди парня", "ищи друзей"],
+    "responses": ["Окей, ищу кого-то", "Врубаю режим знакомств", "Щас найду тебе пару", "Секунду, сканирую сервер", "Погнали искать"],
     "action": "wingman"
   },
   "sit_response": {
-    "triggers": ["syad", "sidish", "pochesy"],
-    "responses": ["Siju, otdyhayu", "Mne norm", "Nogi ustali", "Uyutno tut"],
+    "triggers": ["сядь", "сидишь", "присядь"],
+    "responses": ["Сижу, отдыхаю", "Мне норм", "Ноги устали", "Уютно тут", "Не хочу вставать"],
     "action": "none"
   },
   "getout_command": {
-    "triggers": ["slez", "vstan", "vyhodi", "exit", "get out", "vylazi"],
-    "responses": ["Vstayu", "Ladno, vstayu", "Uje na nogah", "Okey, vyhaju"],
+    "triggers": ["слезь", "встань", "выходи", "выйди", "вылазь", "вставай"],
+    "responses": ["Встаю", "Ладно, встаю", "Уже на ногах", "Окей, выхожу", "Понял"],
     "action": "getout"
   }
 }
