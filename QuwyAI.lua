@@ -23,7 +23,7 @@ local RootPart = Character:WaitForChild("HumanoidRootPart")
 local Config = {
     Name = "quwy",
     GlobalRange = 1200,
-    StuckThreshold = 2.5,
+    StuckThreshold = 2.0,
     JumpCheckDist = 4
 }
 
@@ -474,20 +474,70 @@ end
 UpdateCharacter()
 table.insert(Connections, LocalPlayer.CharacterAdded:Connect(UpdateCharacter))
 
+local function IsPathBlocked(targetPos)
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {Character}
+    
+    local dir = targetPos - RootPart.Position
+    if dir.Magnitude < 1 then return false end
+    
+    local ray = workspace:Raycast(RootPart.Position, dir.Unit * math.min(dir.Magnitude, 100), params)
+    return ray ~= nil
+end
+
 local function CheckForObstacles()
     local lookVector = RootPart.CFrame.LookVector
     local startPos = RootPart.Position - Vector3.new(0, 1, 0)
     local params = RaycastParams.new(); params.FilterType = Enum.RaycastFilterType.Exclude; params.FilterDescendantsInstances = {Character}
     local ray = workspace:Raycast(startPos, lookVector * Config.JumpCheckDist, params)
+    
     if ray then
         local highRay = workspace:Raycast(startPos + Vector3.new(0, 3, 0), lookVector * Config.JumpCheckDist, params)
-        if not highRay then Humanoid.Jump = true end
+        if not highRay then 
+            Humanoid.Jump = true 
+        else
+            local rightRay = workspace:Raycast(startPos, (lookVector + RootPart.CFrame.RightVector).Unit * Config.JumpCheckDist, params)
+            local leftRay = workspace:Raycast(startPos, (lookVector - RootPart.CFrame.RightVector).Unit * Config.JumpCheckDist, params)
+            
+            if rightRay and not leftRay then
+                Humanoid:Move(Vector3.new(-1, 0, 0), true)
+            elseif leftRay and not rightRay then
+                Humanoid:Move(Vector3.new(1, 0, 0), true)
+            end
+        end
     end
+end
+
+local function UnstuckAction()
+    Humanoid:MoveTo(RootPart.Position - RootPart.CFrame.LookVector * 5)
+    task.wait(0.5)
+    local sideDir = math.random() > 0.5 and 1 or -1
+    Humanoid:Move(Vector3.new(sideDir, 0, 0), true) 
+    task.wait(0.5)
 end
 
 local function MoveToPoint(destination)
     if Humanoid.Sit then return false end
     State.IsMoving = true
+    
+    if not IsPathBlocked(destination) then
+        Humanoid:MoveTo(destination)
+        
+        local timer = 0
+        repeat
+            task.wait(0.1)
+            timer = timer + 0.1
+            if (RootPart.Position - destination).Magnitude < 4 then
+                State.IsMoving = false
+                return true
+            end
+        until timer > 2 or Humanoid.Sit
+        
+        if timer > 2 then
+             -- If we timed out walking straight, assume we are stuck or logic failed, enforce pathfinding next
+        end
+    end
     
     local path = PathfindingService:CreatePath({
         AgentRadius = 1.0, AgentHeight = 5, AgentCanJump = true, WaypointSpacing = 6,
@@ -528,19 +578,13 @@ local function MoveToPoint(destination)
             until (RootPart.Position - waypoint.Position).Magnitude < 4 or stuckTimer > Config.StuckThreshold or Humanoid.Sit
             
             if stuckTimer > Config.StuckThreshold then
-                if Humanoid:GetState() == Enum.HumanoidStateType.Swimming then
-                    Humanoid.Jump = true
-                else
-                    Humanoid:MoveTo(RootPart.Position - RootPart.CFrame.LookVector * 5)
-                    task.wait(0.5)
-                end
+                UnstuckAction()
                 State.IsMoving = false
                 return false
             end
         end
     else
-        Humanoid:MoveTo(destination)
-        task.wait(1)
+        UnstuckAction()
     end
     State.IsMoving = false
     return true
@@ -587,7 +631,7 @@ task.spawn(function()
                     end
                 else
                     State.Mode = "Wander"
-                    SendChat("Потерял цель.")
+                    SendChat("Цель потеряна (игрок вышел или исчез).")
                 end
 
             elseif State.Mode == "Wingman" then
