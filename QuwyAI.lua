@@ -2,7 +2,9 @@ if _G.AiScript_Cleanup then
     _G.AiScript_Cleanup()
 end
 
-local BrainURL = "https://raw.githubusercontent.com/zyphralex/AI-Script-RB/refs/heads/main/brain.json"
+local BrainURL_RU = "https://raw.githubusercontent.com/zyphralex/AI-Script-RB/refs/heads/main/brain_RU.json"
+local BrainURL_EN = "https://raw.githubusercontent.com/zyphralex/AI-Script-RB/refs/heads/main/brain_EN.json" 
+
 local ConfigFile = "quwy_ai_config.json"
 
 local Players = game:GetService("Players")
@@ -23,9 +25,12 @@ local RootPart = Character:WaitForChild("HumanoidRootPart")
 local Config = {
     Name = "quwy",
     GlobalRange = 1200,
-    StuckThreshold = 2.0,
-    JumpCheckDist = 4
+    StuckThreshold = 2.5,
+    JumpCheckDist = 4,
+    Language = "RU"
 }
+
+local CurrentBrainURL = BrainURL_RU
 
 local function SaveSettings()
     if writefile then
@@ -43,8 +48,15 @@ local function LoadSettings()
             if s2 and d then
                 if d.Name then Config.Name = d.Name end
                 if d.GlobalRange then Config.GlobalRange = d.GlobalRange end
+                if d.Language then Config.Language = d.Language end
             end
         end
+    end
+    
+    if Config.Language == "EN" then
+        CurrentBrainURL = BrainURL_EN
+    else
+        CurrentBrainURL = BrainURL_RU
     end
 end
 LoadSettings()
@@ -60,6 +72,14 @@ local State = {
 
 local BrainData = {}
 local Connections = {}
+
+local BackupBrain = {
+    greeting={triggers={"hello"}, responses={"..."}},
+    system_phrases={
+        wingman_start={"..."}, wingman_greetings={"Hi"}, target_search_start={"..."},
+        target_found={"!"}, target_lost={"?"}, player_not_found={"?"}, stop_confirm={"."}
+    }
+}
 
 local Theme = {
     Background = Color3.fromRGB(15, 15, 20),
@@ -214,16 +234,24 @@ local function CreateInput(text, parent, x, y, callback)
 end
 
 local function LoadBrain()
-    local success, result = pcall(function() return game:HttpGet(BrainURL) end)
+    local success, result = pcall(function() return game:HttpGet(CurrentBrainURL) end)
     if success then
         local decodeSuccess, decoded = pcall(function() return HttpService:JSONDecode(result) end)
-        if decodeSuccess then BrainData = decoded; Notify("Brain Loaded!") end
+        if decodeSuccess then BrainData = decoded; Notify("Brain Loaded (".. Config.Language ..")") end
     else
         Notify("Brain Error. Using Backup.")
-        BrainData = {greeting={triggers={"privet"}, responses={"Offline Mode"}, action="none"}}
+        BrainData = BackupBrain
     end
 end
 task.spawn(LoadBrain)
+
+local function GetSysPhrase(key)
+    if BrainData and BrainData.system_phrases and BrainData.system_phrases[key] then
+        local list = BrainData.system_phrases[key]
+        return list[math.random(1, #list)]
+    end
+    return "..."
+end
 
 CreateButton("Activate AI", Page1, 10, 15, function(s, btn)
     State.Enabled = s
@@ -273,8 +301,48 @@ CreateInput(tostring(Config.GlobalRange), Page2, 185, 15, function(txt)
     end
 end)
 
+local LangLabel = Instance.new("TextLabel", Page2)
+LangLabel.BackgroundTransparency = 1; LangLabel.Position = UDim2.new(0, 10, 0, 60); LangLabel.Size = UDim2.new(0, 200, 0, 20)
+LangLabel.Font = Enum.Font.GothamBold; LangLabel.Text = "Chat Language:"; LangLabel.TextColor3 = Theme.SubText; LangLabel.TextSize = 12; LangLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local BtnRU = Instance.new("TextButton", Page2)
+BtnRU.BackgroundColor3 = Theme.Element; BtnRU.Position = UDim2.new(0, 10, 0, 85); BtnRU.Size = UDim2.new(0, 80, 0, 30)
+BtnRU.Font = Enum.Font.GothamBold; BtnRU.Text = "[ RU ]"; BtnRU.TextColor3 = Theme.Text; BtnRU.TextSize = 12
+Instance.new("UICorner", BtnRU).CornerRadius = UDim.new(0, 4)
+
+local BtnEN = Instance.new("TextButton", Page2)
+BtnEN.BackgroundColor3 = Theme.Element; BtnEN.Position = UDim2.new(0, 100, 0, 85); BtnEN.Size = UDim2.new(0, 80, 0, 30)
+BtnEN.Font = Enum.Font.GothamBold; BtnEN.Text = "[ EN ]"; BtnEN.TextColor3 = Theme.Text; BtnEN.TextSize = 12
+Instance.new("UICorner", BtnEN).CornerRadius = UDim.new(0, 4)
+
+local function UpdateLangButtons()
+    if Config.Language == "RU" then
+        BtnRU.BackgroundColor3 = Theme.Accent
+        BtnEN.BackgroundColor3 = Theme.Element
+    else
+        BtnEN.BackgroundColor3 = Theme.Accent
+        BtnRU.BackgroundColor3 = Theme.Element
+    end
+end
+UpdateLangButtons()
+
+local function SetLang(lang)
+    Config.Language = lang
+    if lang == "EN" then
+        CurrentBrainURL = BrainURL_EN
+    else
+        CurrentBrainURL = BrainURL_RU
+    end
+    SaveSettings()
+    UpdateLangButtons()
+    LoadBrain()
+end
+
+BtnRU.MouseButton1Click:Connect(function() SetLang("RU") end)
+BtnEN.MouseButton1Click:Connect(function() SetLang("EN") end)
+
 local SettingsNote = Instance.new("TextLabel", Page2)
-SettingsNote.BackgroundTransparency = 1; SettingsNote.Position = UDim2.new(0, 10, 0, 60); SettingsNote.Size = UDim2.new(1, -20, 0, 100)
+SettingsNote.BackgroundTransparency = 1; SettingsNote.Position = UDim2.new(0, 10, 0, 130); SettingsNote.Size = UDim2.new(1, -20, 0, 100)
 SettingsNote.Font = Enum.Font.Gotham; SettingsNote.Text = "Settings are saved automatically.\nPress Enter after typing.\n\nAI supports swimming and climbing."; SettingsNote.TextColor3 = Theme.SubText; SettingsNote.TextSize = 12; SettingsNote.TextWrapped = true; SettingsNote.TextXAlignment = Enum.TextXAlignment.Left
 
 local AboutTitle = Instance.new("TextLabel", Page3)
@@ -289,7 +357,7 @@ local function CreateLinkBtn(text, url, yPos)
 end
 CreateLinkBtn("Telegram: QLogovo", "https://t.me/QLogovo", 0)
 CreateLinkBtn("Discord Server", "https://discord.gg/9wCEUewSbN", 45)
-CreateLinkBtn("GitHub Repository", BrainURL, 90)
+CreateLinkBtn("GitHub Repository", BrainURL_RU, 90)
 
 local Circle = Instance.new("TextButton"); Circle.Parent = ScreenGui; Circle.BackgroundColor3 = Theme.Background; Circle.Size = UDim2.new(0, 45, 0, 45); Circle.Position = UDim2.new(0.05, 0, 0.1, 0)
 Circle.Text = "Q"; Circle.Font = Enum.Font.GothamBold; Circle.TextColor3 = Theme.Accent; Circle.TextSize = 22; Circle.Visible = false; Circle.AutoButtonColor = true
@@ -378,7 +446,7 @@ local function HandleChat(player, message)
         if targetName and (string.find(targetName, "друг") or string.find(targetName, "friend") or string.find(targetName, "парн") or string.find(targetName, "девуш")) then
             State.Mode = "Wingman"
             State.WingmanTarget = nil
-            SendChat("Окей, ищу кого-нибудь!")
+            SendChat(GetSysPhrase("wingman_start"))
             return
         end
 
@@ -387,9 +455,9 @@ local function HandleChat(player, message)
             if found then
                 State.Mode = "TargetSearch"
                 State.Target = found
-                SendChat("Ищу " .. found.Name .. "...")
+                SendChat(string.format(GetSysPhrase("target_search_start"), found.Name))
             else
-                SendChat("Не вижу такого игрока.")
+                SendChat(GetSysPhrase("player_not_found"))
             end
         end
         return
@@ -399,35 +467,38 @@ local function HandleChat(player, message)
         State.Mode = "Wander"
         State.Target = nil
         State.WingmanTarget = nil
-        SendChat("Окей, перестаю.")
+        SendChat(GetSysPhrase("stop_confirm"))
         return
     end
     
     local foundResponse = false
     for categoryName, categoryData in pairs(BrainData) do
-        for _, trigger in pairs(categoryData.triggers) do
-            if string.find(cleanMsg, trigger) then
-                local responses = categoryData.responses
-                local reply = responses[math.random(1, #responses)]
-                SendChat(reply)
-                
-                local action = categoryData.action
-                if action == "follow" then
-                    State.Mode = "Follow"
-                    State.Target = player.Character
-                elseif action == "stop" then
-                    State.Mode = "Wander"
-                    State.Target = nil
-                    State.WingmanTarget = nil
-                elseif action == "wingman" then
-                    State.Mode = "Wingman"
-                    State.WingmanTarget = nil
-                elseif action == "getout" then
-                     if Humanoid.Sit then Humanoid.Sit = false; Humanoid.Jump = true end
+        if categoryName ~= "system_phrases" then
+            for _, trigger in pairs(categoryData.triggers) do
+                if string.find(cleanMsg, trigger) then
+                    local responses = categoryData.responses
+                    local reply = responses[math.random(1, #responses)]
+                    SendChat(reply)
+                    
+                    local action = categoryData.action
+                    if action == "follow" then
+                        State.Mode = "Follow"
+                        State.Target = player.Character
+                    elseif action == "stop" then
+                        State.Mode = "Wander"
+                        State.Target = nil
+                        State.WingmanTarget = nil
+                    elseif action == "wingman" then
+                        State.Mode = "Wingman"
+                        State.WingmanTarget = nil
+                        SendChat(GetSysPhrase("wingman_start"))
+                    elseif action == "getout" then
+                         if Humanoid.Sit then Humanoid.Sit = false; Humanoid.Jump = true end
+                    end
+                    
+                    foundResponse = true
+                    break
                 end
-                
-                foundResponse = true
-                break
             end
         end
         if foundResponse then break end
@@ -504,17 +575,19 @@ local function CheckForObstacles()
                 Humanoid:Move(Vector3.new(-1, 0, 0), true)
             elseif leftRay and not rightRay then
                 Humanoid:Move(Vector3.new(1, 0, 0), true)
+            else
+                Humanoid:Move(Vector3.new(0, 0, -1), true)
             end
         end
     end
 end
 
 local function UnstuckAction()
-    Humanoid:MoveTo(RootPart.Position - RootPart.CFrame.LookVector * 5)
+    Humanoid:MoveTo(RootPart.Position - RootPart.CFrame.LookVector * 8)
     task.wait(0.5)
     local sideDir = math.random() > 0.5 and 1 or -1
     Humanoid:Move(Vector3.new(sideDir, 0, 0), true) 
-    task.wait(0.5)
+    task.wait(0.8)
 end
 
 local function MoveToPoint(destination)
@@ -532,10 +605,10 @@ local function MoveToPoint(destination)
                 State.IsMoving = false
                 return true
             end
-        until timer > 2 or Humanoid.Sit
+        until timer > 8 or Humanoid.Sit
         
-        if timer > 2 then
-             -- If we timed out walking straight, assume we are stuck or logic failed, enforce pathfinding next
+        if timer > 8 then
+             -- Timeout
         end
     end
     
@@ -585,6 +658,7 @@ local function MoveToPoint(destination)
         end
     else
         UnstuckAction()
+        return false
     end
     State.IsMoving = false
     return true
@@ -606,73 +680,81 @@ end
 
 task.spawn(function()
     while task.wait(0.2) do
-        if not State.Enabled then continue end
-        if not Character or not Character.Parent then continue end
-        if Humanoid.Sit then continue end
-        
-        if not State.IsMoving then
-            if State.Mode == "Follow" and State.Target and State.Target.Parent then
-                local dist = (RootPart.Position - State.Target.HumanoidRootPart.Position).Magnitude
-                if dist > 8 then MoveToPoint(State.Target.HumanoidRootPart.Position) end
+        pcall(function()
+            if not State.Enabled then return end
+            if not Character or not Character.Parent then return end
+            if Humanoid.Sit then return end
             
-            elseif State.Mode == "TargetSearch" then
-                if State.Target and State.Target.Parent and State.Target.Character then
-                    local targetPos = State.Target.Character.HumanoidRootPart.Position
-                    local dist = (RootPart.Position - targetPos).Magnitude
-                    if dist > 8 then
-                        MoveToPoint(targetPos)
+            if not State.IsMoving then
+                if State.Mode == "Follow" and State.Target and State.Target.Parent then
+                    local dist = (RootPart.Position - State.Target.HumanoidRootPart.Position).Magnitude
+                    if dist > 8 then MoveToPoint(State.Target.HumanoidRootPart.Position) end
+                
+                elseif State.Mode == "TargetSearch" then
+                    if State.Target and State.Target.Parent and State.Target.Character then
+                        local targetPos = State.Target.Character.HumanoidRootPart.Position
+                        local dist = (RootPart.Position - targetPos).Magnitude
+                        if dist > 8 then
+                            local s = MoveToPoint(targetPos)
+                            if not s then State.Target = nil; State.Mode = "Wander" end
+                        else
+                            local lookPos = Vector3.new(targetPos.X, RootPart.Position.Y, targetPos.Z)
+                            RootPart.CFrame = CFrame.new(RootPart.Position, lookPos)
+                            SendChat(GetSysPhrase("target_found"))
+                            task.wait(2)
+                            State.Mode = "Wander"
+                            State.Target = nil
+                        end
                     else
-                        local lookPos = Vector3.new(targetPos.X, RootPart.Position.Y, targetPos.Z)
-                        RootPart.CFrame = CFrame.new(RootPart.Position, lookPos)
-                        SendChat("Нашел!")
-                        task.wait(2)
                         State.Mode = "Wander"
-                        State.Target = nil
+                        SendChat(GetSysPhrase("target_lost"))
                     end
-                else
-                    State.Mode = "Wander"
-                    SendChat("Цель потеряна (игрок вышел или исчез).")
-                end
 
-            elseif State.Mode == "Wingman" then
-                if not State.WingmanTarget then
-                    local friend = FindNewFriend()
-                    if friend then
-                        State.WingmanTarget = friend
-                        Notify("Target: " .. friend.Name)
-                    else
-                        State.Mode = "Wander"
-                    end
-                elseif State.WingmanTarget and State.WingmanTarget.Parent and State.WingmanTarget.Character then
-                    local targetPos = State.WingmanTarget.Character.HumanoidRootPart.Position
-                    local dist = (RootPart.Position - targetPos).Magnitude
-                    
-                    if dist > 8 then
-                        MoveToPoint(targetPos)
-                    else
-                        local lookPos = Vector3.new(targetPos.X, RootPart.Position.Y, targetPos.Z)
-                        RootPart.CFrame = CFrame.new(RootPart.Position, lookPos)
+                elseif State.Mode == "Wingman" then
+                    if not State.WingmanTarget then
+                        local friend = FindNewFriend()
+                        if friend then
+                            State.WingmanTarget = friend
+                            Notify("Target: " .. friend.Name)
+                        else
+                            State.Mode = "Wander"
+                        end
+                    elseif State.WingmanTarget and State.WingmanTarget.Parent and State.WingmanTarget.Character then
+                        local targetPos = State.WingmanTarget.Character.HumanoidRootPart.Position
+                        local dist = (RootPart.Position - targetPos).Magnitude
                         
-                        local phrases = {"Привет! Давай дружить?", "Го дружить?", "Привет, давай знакомиться!", "Ты классный, давай дружить?"}
-                        SendChat(phrases[math.random(1, #phrases)])
-                        
-                        task.wait(3)
+                        if dist > 8 then
+                            local s = MoveToPoint(targetPos)
+                            if not s then State.WingmanTarget = nil end
+                        else
+                            local lookPos = Vector3.new(targetPos.X, RootPart.Position.Y, targetPos.Z)
+                            RootPart.CFrame = CFrame.new(RootPart.Position, lookPos)
+                            
+                            SendChat(GetSysPhrase("wingman_greetings"))
+                            
+                            task.wait(3)
+                            State.WingmanTarget = nil
+                            State.Mode = "Wander"
+                        end
+                    else
                         State.WingmanTarget = nil
                         State.Mode = "Wander"
                     end
-                else
-                    State.WingmanTarget = nil
-                    State.Mode = "Wander"
-                end
 
-            elseif State.Mode == "Wander" then
-                local rx = math.random(-Config.GlobalRange, Config.GlobalRange)
-                local rz = math.random(-Config.GlobalRange, Config.GlobalRange)
-                local potentialDest = RootPart.Position + Vector3.new(rx, 0, rz)
-                local params = RaycastParams.new(); params.FilterType = Enum.RaycastFilterType.Exclude; params.FilterDescendantsInstances = {Character}
-                local ray = workspace:Raycast(potentialDest + Vector3.new(0,500,0), Vector3.new(0,-1000,0), params)
-                if ray then MoveToPoint(ray.Position) end
+                elseif State.Mode == "Wander" then
+                    local rx = math.random(-Config.GlobalRange, Config.GlobalRange)
+                    local rz = math.random(-Config.GlobalRange, Config.GlobalRange)
+                    local potentialDest = RootPart.Position + Vector3.new(rx, 0, rz)
+                    local params = RaycastParams.new(); params.FilterType = Enum.RaycastFilterType.Exclude; params.FilterDescendantsInstances = {Character}
+                    local ray = workspace:Raycast(potentialDest + Vector3.new(0,500,0), Vector3.new(0,-1000,0), params)
+                    if ray then 
+                        local success = MoveToPoint(ray.Position)
+                        if not success then State.IsMoving = false end
+                    else
+                        State.IsMoving = false
+                    end
+                end
             end
-        end
+        end)
     end
 end)
