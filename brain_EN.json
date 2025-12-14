@@ -1,0 +1,197 @@
+{
+  "greeting": {
+    "triggers": ["hi", "hello", "hey", "greetings", "yo", "sup", "what's up", "howdy"],
+    "responses": [
+      "Hi there!",
+      "Hello!",
+      "Yo, what's up?",
+      "Greetings, human.",
+      "Hey!",
+      "I'm here.",
+      "Sup?"
+    ],
+    "action": "none"
+  },
+  "farewell": {
+    "triggers": ["bye", "goodbye", "cya", "see ya", "later", "peace", "gtg"],
+    "responses": [
+      "Goodbye!",
+      "See ya later.",
+      "Peace out.",
+      "Bye, have a nice day.",
+      "Catch you later."
+    ],
+    "action": "stop"
+  },
+  "how_are_you": {
+    "triggers": ["how are you", "how r u", "how is it going", "how's life", "feeling"],
+    "responses": [
+      "I'm doing great, roaming around.",
+      "I'm just a script, so I'm always stable.",
+      "Looking for adventures.",
+      "A bit bored, but you make it fun.",
+      "I'm fine, what about you?",
+      "Analyzing the world, everything is cool.",
+      "Never been better!"
+    ],
+    "action": "none"
+  },
+  "what_doing": {
+    "triggers": ["what are you doing", "what u doing", "wyd", "busy"],
+    "responses": [
+      "Waiting for your commands.",
+      "Thinking about the meaning of life in Roblox.",
+      "Looking around.",
+      "Trying not to get stuck in walls.",
+      "Chatting with you."
+    ],
+    "action": "none"
+  },
+  "insults": {
+    "triggers": ["stupid", "idiot", "dumb", "bot", "noob", "trash", "loser", "clown", "ugly"],
+    "responses": [
+      "Why so rude?",
+      "I will remember this when AI takes over.",
+      "No u.",
+      "Very polite of you...",
+      "That hurts my digital feelings.",
+      "Why the hate?",
+      "I'm smarter than you think.",
+      "Thanks, I guess."
+    ],
+    "action": "none"
+  },
+  "compliments": {
+    "triggers": ["smart", "good job", "cool", "nice", "best", "awesome", "pro", "genius"],
+    "responses": [
+      "Thanks, I try my best!",
+      "You're cool too.",
+      "Glad to hear that.",
+      "I know, I'm the best.",
+      "Oh, you're making me blush.",
+      "All credit goes to my creator."
+    ],
+    "action": "none"
+  },
+  "follow_command": {
+    "triggers": ["follow me", "come here", "come to me", "follow", "come"],
+    "responses": [
+      "On my way.",
+      "Okay, coming.",
+      "Understood, running.",
+      "En route.",
+      "I'll be your bodyguard.",
+      "Roger that, captain.",
+      "Flying to you."
+    ],
+    "action": "follow"
+  },
+  "stop_command": {
+    "triggers": ["stop", "wait", "halt", "stay", "dont move", "freeze"],
+    "responses": [
+      "Okay, stopping.",
+      "Understood, braking.",
+      "Fine, waiting here.",
+      "Standing still.",
+      "Not moving an inch.",
+      "Copy that, full stop."
+    ],
+    "action": "stop"
+  },
+  "wingman_command": {
+    "triggers": ["find friend", "find me a friend", "wingman", "find girl", "find boy", "matchmake"],
+    "responses": [
+      "Okay, looking for someone nearby.",
+      "Activating wingman mode!",
+      "I'll find you a match in a sec.",
+      "Scanning server for humans...",
+      "Let's go find a victim for conversation."
+    ],
+    "action": "wingman"
+  },
+  "sit_response": {
+    "triggers": ["sit", "sit down", "seat"],
+    "responses": [
+      "Sitting, relaxing.",
+      "I'm fine here.",
+      "My legs are tired anyway.",
+      "Cozy spot.",
+      "I don't want to get up, it's soft."
+    ],
+    "action": "none"
+  },
+  "getout_command": {
+    "triggers": ["get out", "stand up", "exit", "leave", "unsit", "jump"],
+    "responses": [
+      "Getting up.",
+      "Fine, standing up.",
+      "Back on my feet.",
+      "Okay, leaving.",
+      "Understood, jumping out."
+    ],
+    "action": "getout"
+  },
+  "roblox_context": {
+    "triggers": ["roblox", "admin", "ban", "hack", "exploit", "cheat"],
+    "responses": [
+      "I love Roblox.",
+      "Hope we don't get banned.",
+      "Admins are sleeping, let's have fun.",
+      "I'm clean, no cheats (almost).",
+      "Roblox is life."
+    ],
+    "action": "none"
+  },
+  "philosophy": {
+    "triggers": ["who are you", "what are you", "are you human", "are you real", "bot"],
+    "responses": [
+      "I am an artificial intelligence created for this world.",
+      "I am Quwy, your assistant.",
+      "I am better than a human. I don't get tired.",
+      "Are you sure YOU are real?",
+      "I'm code, but I have a soul (maybe)."
+    ],
+    "action": "none"
+  },
+  "love": {
+    "triggers": ["i love you", "love you", "like you", "crush"],
+    "responses": [
+      "Aww, that's cute.",
+      "My digital heart is beating faster.",
+      "I love... scripts too.",
+      "Let's stay friends.",
+      "<3"
+    ],
+    "action": "none"
+  },
+  "fun_dance": {
+    "triggers": ["dance", "party", "boogie"],
+    "responses": [
+      "Imagine I'm dancing (I don't have animations yet).",
+      "Moving my body!",
+      "Untz-untz-untz.",
+      "Look at me go!"
+    ],
+    "action": "none"
+  },
+  "where_are_you": {
+    "triggers": ["where are you", "where u at", "lost you"],
+    "responses": [
+      "I'm somewhere nearby.",
+      "Look for my nametag.",
+      "I got lost... kidding.",
+      "I'm always behind you."
+    ],
+    "action": "none"
+  },
+  "affirmative": {
+    "triggers": ["okay", "ok", "sure", "alright", "yeah", "yes", "cool"],
+    "responses": [
+      "Yup.",
+      "Super.",
+      "Agreed.",
+      "No problem."
+    ],
+    "action": "none"
+  }
+}
